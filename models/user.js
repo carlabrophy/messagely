@@ -39,6 +39,7 @@ class User {
 			[username]
 		);
 		const user = results.rows[0];
+
 		return user && (await bcrypt.compare(password, user.password));
 	}
 
@@ -61,15 +62,16 @@ class User {
 	 * [{username, first_name, last_name, phone}, ...] */
 
 	static async all() {
-		const results = await db.query(
-			`SELECT username, first_name, last_name, phone
-      FROM users`
+		const result = await db.query(
+			`SELECT username,
+              first_name,
+              last_name,
+              phone
+          FROM users
+          ORDER BY username`
 		);
-		if (!results.rows[0]) {
-			throw new ExpressError(`No such user: ${username}`, 404);
-		}
 
-		return results.rows;
+		return result.rows;
 	}
 
 	/** Get: get user by username
@@ -82,14 +84,23 @@ class User {
 	 *          last_login_at } */
 
 	static async get(username) {
-		const results = await db.query(
-			`SELECT username, first_name, last_name, phone, join_at, last_login_at
-      FROM users
-      WHERE id = $1`,
+		const result = await db.query(
+			`SELECT username,
+              first_name,
+              last_name,
+              phone,
+              join_at,
+              last_login_at
+          FROM users
+          WHERE username = $1`,
 			[username]
 		);
 
-		return results.rows[0];
+		if (!result.rows[0]) {
+			throw new ExpressError(`No such user: ${username}`, 404);
+		}
+
+		return result.rows[0];
 	}
 
 	/** Return messages from this user.
