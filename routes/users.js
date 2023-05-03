@@ -24,7 +24,7 @@ router.get("/", ensureLoggedIn, async (req, res, next) => {
  *
  **/
 
-router.get("/:username", ensureLoggedIn, async function (req, res, next) {
+router.get("/:username", ensureCorrectUser, async function (req, res, next) {
 	try {
 		const { username } = req.params;
 		const user = await User.get(username);
